@@ -10,19 +10,26 @@ export class MailerService {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'your-email@gmail.com', // Your Gmail address
-        pass: 'your-app-password', // Your Gmail App Password
+        user: process.env.MAILER_EMAIL, // Your Gmail address
+        pass: process.env.MAILER_PASSWORD, // Your Gmail App Password
       },
     });
   }
 
-  async sendMail(to: string, subject: string, text: string, html?: string) {
+  async sendMail(
+    to: string,
+    subject: string,
+    text: string,
+    html?: string,
+    attachments?: Array<{ filename: string; content: Buffer }>,
+  ) {
     const mailOptions = {
-      from: '"Your App Name" <your-email@gmail.com>', // Sender address
+      from: '"Your App Name" justinwahala16@gmail.com', // Sender address
       to, // Recipient email
       subject, // Subject line
       text, // Plain text body
       html, // HTML body (optional)
+      attachments, // attachments
     };
 
     try {
