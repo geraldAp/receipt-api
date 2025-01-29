@@ -9,9 +9,9 @@ export class ReceiptService {
     private readonly mailto: MailerService,
   ) {}
 
-  async generateReceipt(receiptDto: ReceiptDTO, email: string) {
+  async generateReceipt(receiptDto: ReceiptDTO, email: string, title: string) {
     console.log('the email', email);
-    const pdfBytes = await this.pdfService.generatePdf(receiptDto);
+    const pdfBytes = await this.pdfService.generatePdf(receiptDto, title);
 
     // Convert to Buffer if pdfBytes is not a Buffer already
     const buffer = Buffer.from(pdfBytes);

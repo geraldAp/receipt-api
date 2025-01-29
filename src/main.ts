@@ -17,6 +17,8 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('Quick E-receipt ')
+    .addServer('v1')
+    .addServer('v2')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/e-receipt', app, documentFactory);
