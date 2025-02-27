@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Query, Version } from '@nestjs/common';
-import { ReceiptDTO } from './dto/receipt.dto';
 import { ReceiptService } from './receipt.service';
+import { DynamicReceiptDTO } from './dto/dynamicReceipt.dto';
 @Controller('receipts')
 export class ReceiptController {
   constructor(private readonly receiptService: ReceiptService) {}
@@ -8,12 +8,16 @@ export class ReceiptController {
   @Post('generate')
   @Version('1')
   async generateReceipt(
-    @Body() receiptData: ReceiptDTO,
+    @Body() receiptData: DynamicReceiptDTO,
     @Query('email') email: string,
     @Query('title') title: string,
   ) {
     console.log('Received data:', receiptData);
 
-    return this.receiptService.generateReceipt(receiptData, email, title);
+    return this.receiptService.generateDynamicReceipt(
+      receiptData,
+      email,
+      title,
+    );
   }
 }

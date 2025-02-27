@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+
 import { ReceiptDTO } from './dto/receipt.dto';
+import { DynamicReceiptDTO } from './dto/dynamicReceipt.dto';
 import { PdfService } from 'src/pdf/pdf.service';
 import { MailerService } from 'src/mailer/mailer.service';
+import * as ejs from 'ejs';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 @Injectable()
 export class ReceiptService {
   constructor(
@@ -9,32 +14,34 @@ export class ReceiptService {
     private readonly mailto: MailerService,
   ) {}
 
-  async generateReceipt(receiptDto: ReceiptDTO, email: string, title: string) {
-    console.log('the email', email);
-    const pdfBytes = await this.pdfService.generatePdf(receiptDto, title);
-
-    // Convert to Buffer if pdfBytes is not a Buffer already
-    const buffer = Buffer.from(pdfBytes);
-
-    // // Base64 encode the PDF
-    // const base64Pdf = buffer.toString('base64');
+  async generateDynamicReceipt(
+    receiptData: DynamicReceiptDTO,
+    email: string,
+    title: string,
+  ) {
     try {
-      const subject = 'Your Receipt from [Your App Name]';
-      const text = 'Please find your receipt attached.';
-      const html = `<p>Dear Customer,</p><p>Thank you for your purchase. Attached is your receipt.</p>`;
+      const templatePath = path.join(
+        process.cwd(),
+        'src',
+        'templates',
+        'receipt.ejs',
+      );
+      const htmlTemplate = await fs.readFile(templatePath, 'utf-8');
 
-      const attachments = [
-        {
-          filename: 'receipt.pdf', // Name of the file to be sent
-          content: buffer, // The Buffer containing the PDF
-        },
-      ];
+      const emailHtml = ejs.render(htmlTemplate, { title, ...receiptData });
+      this.mailto.sendMail(
+        email,
+        'Your Invoice from Quick Hub',
+        'Thank you for shopping with us ',
+        emailHtml,
+      );
 
-      await this.mailto.sendMail(email, subject, text, html, attachments);
-
-      return { message: 'Receipt sent successfully!' };
+      return { message: 'Email sent successfully' };
     } catch (error) {
-      throw new Error(`Failed to send receipt: ${error.message}`);
+      throw new HttpException(
+        `Failed to send email: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR, // Sends a 500 response
+      );
     }
   }
 }
