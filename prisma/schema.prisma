@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,4 +17,11 @@ model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
+}
+
+model Receipt {
+  id        String   @id @default(uuid()) // Unique ID
+  filename  String   // File name
+  s3Url     String?   // S3 storage URL
+  createdAt DateTime @default(now()) // Timestamp
 }
