@@ -1,6 +1,4 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-
-import { ReceiptDTO } from './dto/receipt.dto';
 import { DynamicReceiptDTO } from './dto/dynamicReceipt.dto';
 import { PdfService } from 'src/pdf/pdf.service';
 import { MailerService } from 'src/mailer/mailer.service';
