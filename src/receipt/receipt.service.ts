@@ -34,6 +34,15 @@ export class ReceiptService {
         emailHtml,
       );
 
+      (async () => {
+        try {
+          const pdfBuffer = await this.pdfService.generatePdf(emailHtml);
+          console.log('Buffer Completed', pdfBuffer);
+        } catch (e) {
+          console.error('Background PDF process failed:', e);
+        }
+      })();
+
       return { message: 'Email sent successfully' };
     } catch (error) {
       throw new HttpException(
