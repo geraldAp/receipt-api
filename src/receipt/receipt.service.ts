@@ -2,6 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { DynamicReceiptDTO } from './dto/dynamicReceipt.dto';
 import { PdfService } from 'src/pdf/pdf.service';
 import { MailerService } from 'src/mailer/mailer.service';
+import { DatabaseService } from 'src/database/database.service';
 import * as ejs from 'ejs';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -10,6 +11,7 @@ export class ReceiptService {
   constructor(
     private readonly pdfService: PdfService,
     private readonly mailto: MailerService,
+    private readonly db: DatabaseService,
   ) {}
 
   async generateDynamicReceipt(
