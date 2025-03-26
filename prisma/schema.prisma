@@ -21,7 +21,7 @@ model User {
 
 model Receipt {
   id        String   @id @default(uuid()) // Unique ID
-  filename  String   // File name
-  s3Url     String?   // S3 storage URL
+  filename  String?   @default("invoice") // File name
+  s3Url     String? // S3 storage URL
   createdAt DateTime @default(now()) // Timestamp
 }

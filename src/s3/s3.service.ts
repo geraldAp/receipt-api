@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 @Injectable()
 export class S3Service {
   private readonly s3: S3Client;
@@ -23,13 +27,25 @@ export class S3Service {
         Body: fileBuffer,
         ContentType: 'application/pdf',
       };
-
       await this.s3.send(new PutObjectCommand(uploadParams));
-
-      return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/receipts/${fileName}`;
+      return `receipts/${fileName}`;
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error;
+    }
+  }
+
+  async getSignedUrl(fileKey: string, expiresIn: number) {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: fileKey,
+      });
+
+      return await getSignedUrl(this.s3, command, { expiresIn });
+    } catch (error) {
+      console.error('Error generating signed URL:', error);
+      throw new Error('Failed to generate signed URL');
     }
   }
 }
