@@ -64,7 +64,20 @@ export class ReceiptService {
 
   async downloadReceipt(id: string) {
     try {
-    } catch (error) {}
+      const receipt = await this.db.receipt.findUnique({ where: { id } });
+
+      if (!receipt || !receipt.s3Url) {
+        throw new HttpException('Receipt not found', HttpStatus.NOT_FOUND);
+      }
+
+      const signedUrl = await this.s3Service.getSignedUrl(receipt.s3Url, 3600);
+      return signedUrl;
+    } catch (error) {
+      throw new HttpException(
+        `Failed to send email: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR, // Sends a 500 response
+      );
+    }
   }
 
   async updateReceiptUrlInDB(fileName: string, pdfUrl: string, id: string) {
